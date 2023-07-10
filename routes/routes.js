@@ -24,7 +24,17 @@ router.get('/api/notes', (req, res) => {
 //receives and posts new notes
 router.post('/api/notes', (req, res) => {
     //code to receive and post new notes
-    const {}
+    const {title, text } = req.body;
+
+    if (req.body) {
+        const newNote = {
+            title,
+            text,
+        };
+
+        readAndAppend(newNote, './db/db.json');
+        res.json(`Tip added successfully`);
+    }
 });
 
 module.exports = router;
