@@ -17,8 +17,9 @@ router.get('/notes', (req, res) =>
 // reads notes
 router.get('/api/notes', (req, res) => {
     //code to read the notes from JSON file
-    readFromFile('../db/db.json').then((data) =>
-    res.json(JSON.parse(data)));
+    readFromFile(path.join(__dirname, '../db/db.json'))
+    .then((data) => res.json(JSON.parse(data)))
+    .catch((err) => res.status(500).json({ error: err}));
 });
 
 //receives and posts new notes
@@ -26,15 +27,22 @@ router.post('/api/notes', (req, res) => {
     //code to receive and post new notes
     const {title, text } = req.body;
 
-    if (req.body) {
-        const newNote = {
-            title,
-            text,
-        };
-
-        readAndAppend(newNote, './db/db.json');
-        res.json(`Tip added successfully`);
+    if (!title || !text) {
+        return res.status(400).json({ error: 'Missing title or text in request body' });
     }
+
+    const newNote = {
+        title,
+        text,
+    };
+
+    readAndAppend(newNote, path.join(__dirname, '../db/db.json'))
+    .then(() => res.json(newNote))
+    .catch((err) => res.status(500).json({ error: err}));
 });
+
+router.get('*', (req, res) =>
+res.sendFile(path.join(__dirname, '../public/index.html'))
+);
 
 module.exports = router;
